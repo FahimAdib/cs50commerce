@@ -1,0 +1,21 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %} Watchlist {% endblock %}
+
+{% block body %}
+
+<div class="category_block">
+    <div class="headings">
+        <h2>Watchlist</h2>
+    </div>
+
+    {% for items in watchlist%}
+
+    <div class="category_list">
+        <ul>
+            <li><a href="/listing/{{ items.listing.title }}">{{ items.listing.title }}</a></li>
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

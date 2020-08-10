@@ -1,0 +1,107 @@
+{% extends "auctions/layout.html" %}
+
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block body %}
+<div class="listing_block_main">
+    <div class="listing_content">
+        <div class="listing_content_view">
+            <div>
+                <div class="currentTitle">{{ current.title }} </div> <br>
+                {% if user.is_authenticated %}
+                <div class="buttonPosition">
+                    <form action="/listing/{{ title }}" method="post">
+                        {% csrf_token %}
+                        {% if watchlist.user == request.user.username and watchlist.listing == current %}
+                        {% if watchlist.listing == current %}
+                        <button type="submit" method="post" value="Remove from Watchlist" name="remove"
+                            class="buttonAll">
+                            Unsave</button>
+                        {% endif %}
+                        {% else %}
+                        <button type="submit" method="post" value="Add to Watchlist" name="add"
+                            class="buttonAll">Save</button>
+                        {% endif %}
+                    </form>
+                    {% endif %}
+                </div>
+                <div class="details">
+
+                    <div id="listing_image">
+                        <img src="{{ current.url }}" alt="None"> <br><br>
+                    </div>
+                    Listed by: <strong>{{ current.owner }}</strong><br><br>
+                    {{ current.description|linebreaks }} <br>
+                    {% if current.url %}
+                    {% endif %}
+                    <div class="prices">
+                        Starting bid: <strong>${{ current.starting_bid }}</strong><br>
+                        Current bid: <strong>${{ current.bids.bid }}</strong>
+                    </div>
+                    <br>
+                    <div class="close">
+                        {% if current.owner  == request.user.username and current.status %}
+                        <a href="/close/{{ current.title }}">Close Listing</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="details">
+
+                {% if current.status %}
+                {% if user.is_authenticated %}
+                {% if request.user.username != current.owner %}
+
+                <form action="/listing/{{ title }}" method="post">
+                    {% csrf_token %}
+                    <strong> Place a Bid: </strong><br>
+                    {{ bid.new_bid }}
+                    <br><br>
+                    <button type="submit" method="post" name="bid" class="buttonAll">Submit</button>
+                </form>
+                {% endif %}
+                {% endif %}
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                {% else %}
+                Bidding has ended
+
+                {% if current.bids.user == request.user.username %}
+                You have won the bid.
+                {% endif %}
+                {% endif %}
+
+            </div>
+
+            <div class="comments">
+                <h5>Comments</h5>
+                <div class="commentsView">
+                    <ul>
+                        {% for comments in comment %}
+                        <li>{{ comments.user }} : {{ comments.comments }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% if user.is_authenticated %}
+                <form action="/listing/{{ title }}" method="post">
+                    {% csrf_token %}
+                    {{ formComment.comments }}
+                    <br>
+                    <div id="commentSubmit">
+                        <button type="submit" method="post" name="comment" class="buttonAll">Submit</button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
